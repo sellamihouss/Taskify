@@ -4,6 +4,9 @@ import { PrismaClient } from "./generated/prisma";
 import 'dotenv/config'
 
 
+import userRoutes from './routes/userRoutes';
+
+
 
 const prisma = new PrismaClient();
 const app = express();
@@ -16,6 +19,8 @@ app.use(express.json());
 app.get("/check", (req: Request, res: Response) => {
   res.json({ message: "API running" });
 });
+
+app.use('/api/users', userRoutes);
 
 
 
