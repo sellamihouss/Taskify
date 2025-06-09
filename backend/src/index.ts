@@ -1,10 +1,14 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { PrismaClient } from "./generated/prisma";
+import { auth } from './middlewares/auth';
+
 import 'dotenv/config'
 
+import taskRoutes from './routes/taskRoutes';
 
 import userRoutes from './routes/userRoutes';
+
 
 
 
@@ -21,6 +25,8 @@ app.get("/check", (req: Request, res: Response) => {
 });
 
 app.use('/api/users', userRoutes);
+app.use('/api/tasks', auth, taskRoutes); // Protected task routes
+
 
 
 
