@@ -7,12 +7,11 @@ import { AuthRequest } from '../interfaces/auth.interface';
 
 const prisma = new PrismaClient();
 
-// Register a new user
+// create a new user
 export const register = async (req: RegisterRequest, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email }
     });
@@ -21,7 +20,7 @@ export const register = async (req: RegisterRequest, res: Response) => {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
-    // Hash password
+    // Hashing password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
@@ -56,7 +55,7 @@ export const login = async (req: LoginRequest, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    // Find user
+    // login
     const user = await prisma.user.findUnique({
       where: { email }
     });
@@ -72,7 +71,7 @@ export const login = async (req: LoginRequest, res: Response) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Generate token
+    // token
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET || 'your-secret-key',
@@ -91,7 +90,7 @@ export const login = async (req: LoginRequest, res: Response) => {
   }
 };
 
-// Get user profile
+// Get current user 
 export const getProfile = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
