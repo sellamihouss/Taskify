@@ -19,9 +19,21 @@ model Task {
   id          String   @id @default(cuid())
   title       String
   description String?
-  status      String
+  status      Status
   dueDate     DateTime
-  priority    String
+  priority    Priority
   userId      String
   user        User     @relation(fields: [userId], references: [id])
+}
+
+enum Priority {
+  low
+  medium
+  high
+}
+
+enum Status {
+  pending
+  inProgress
+  completed
 }

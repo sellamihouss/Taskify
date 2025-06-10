@@ -68,7 +68,7 @@ export const login = async (req: LoginRequest, res: Response) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Invalid credentials :wrong password' });
     }
 
     // token
@@ -86,7 +86,7 @@ export const login = async (req: LoginRequest, res: Response) => {
       token
     });
   } catch (error) {
-    res.status(400).json({ error: 'Failed to login' });
+    res.status(500).json({ error: 'Failed to login' });
   }
 };
 

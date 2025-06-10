@@ -13,7 +13,7 @@ export const createTask = async (req: CreateTaskRequest, res: Response) => {
         title,
         description,
         status,
-        dueDate: new Date(dueDate),
+        dueDate: new Date(dueDate), //date input from the user check the format 
         priority,
         userId
       }
