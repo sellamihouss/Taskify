@@ -1,9 +1,53 @@
+import { useState } from 'react';
 import type { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
+import type { RegisterCredentials, User } from '../../types/auth';
+import { authService } from '../../services/api';
 
-const Register: FC = () => {
+interface RegisterProps {
+  onLogin: (user: User) => void;
+}
+
+const Register: FC<RegisterProps> = ({ onLogin }) => {
+  const navigate = useNavigate();
+  const [credentials, setCredentials] = useState<RegisterCredentials>({
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [error, setError] = useState<string>('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCredentials(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (credentials.password !== credentials.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    try {
+      const response = await authService.register(credentials);
+      localStorage.setItem('token', response.token);
+      onLogin(response.user);
+      navigate('/tasks', { replace: true });
+    } catch (err) {
+      setError('Registration failed');
+    }
+  };
+
   return (
-    <form className="space-y-6 max-w-md mx-auto mt-20">
+    <form className="space-y-6 max-w-md mx-auto mt-20" onSubmit={handleSubmit}>
+      {error && (
+        <div className="text-red-500 text-center">{error}</div>
+      )}
       <div className="space-y-4">
+        {/* <h1 className="text-2xl font-medium text-gray-900">Register</h1>   */}
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Email address
@@ -15,6 +59,8 @@ const Register: FC = () => {
             required
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             placeholder="Enter your email"
+            value={credentials.email}
+            onChange={handleChange}
           />
         </div>
         <div>
@@ -28,6 +74,8 @@ const Register: FC = () => {
             required
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             placeholder="Enter your password"
+            value={credentials.password}
+            onChange={handleChange}
           />
         </div>
         <div>
@@ -41,6 +89,8 @@ const Register: FC = () => {
             required
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             placeholder="Confirm your password"
+            value={credentials.confirmPassword}
+            onChange={handleChange}
           />
         </div>
       </div>
@@ -57,6 +107,7 @@ const Register: FC = () => {
       <div className="text-center">
         <button
           type="button"
+          onClick={() => navigate('/login')}
           className="text-sm text-indigo-600 hover:text-indigo-500"
         >
           Already have an account? Sign in
@@ -66,4 +117,4 @@ const Register: FC = () => {
   );
 };
 
-export default Register;
+export default Register; 
