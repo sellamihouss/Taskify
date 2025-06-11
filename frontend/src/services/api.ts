@@ -39,6 +39,7 @@ export const authService = {
 
   getProfile: async () => {
     const { data } = await api.get('/users/profile');
+     //TODO: ADD TOKEN 
     return data;
   },
 };

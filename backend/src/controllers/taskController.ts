@@ -1,13 +1,24 @@
 import { Response, Request } from 'express';
 import { PrismaClient } from '../generated/prisma';
 import { CreateTaskRequest, UpdateTaskRequest, TaskIdRequest } from '../interfaces/task.interface';
+import { createTaskSchema, updateTaskSchema } from '../validations/task.validation';
 
 const prisma = new PrismaClient();
 
 // Create a new task
 export const createTask = async (req: CreateTaskRequest, res: Response) => {
   try {
-    const { title, description, status, dueDate, priority, userId } = req.body;
+    // zod to validate task creation
+    const validationResult = createTaskSchema.safeParse(req.body);
+    
+    if (!validationResult.success) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: validationResult.error.errors 
+      });
+    }
+
+    const { title, description, status, dueDate, priority, userId } = validationResult.data;
     const task = await prisma.task.create({
       data: {
         title,
@@ -45,7 +56,12 @@ export const getTaskById = async (req: TaskIdRequest, res: Response) => {
     const task = await prisma.task.findUnique({
       where: { id },
       include: {
-        user: true
+        user: {
+          select: {
+            id: true,
+            email: true
+          }
+        }
       }
     });
     if (!task) {
@@ -61,7 +77,17 @@ export const getTaskById = async (req: TaskIdRequest, res: Response) => {
 export const updateTask = async (req: UpdateTaskRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { title, description, status, dueDate, priority } = req.body;
+    
+    const validationResult = updateTaskSchema.safeParse(req.body);
+    
+    if (!validationResult.success) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: validationResult.error.errors 
+      });
+    }
+
+    const { title, description, status, dueDate, priority } = validationResult.data;
     const task = await prisma.task.update({
       where: { id },
       data: {

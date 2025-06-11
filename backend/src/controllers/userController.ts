@@ -4,13 +4,23 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { RegisterRequest, LoginRequest } from '../interfaces/user.interface';
 import { AuthRequest } from '../interfaces/auth.interface';
+import { registerSchema, loginSchema } from '../validations/user.validation';
 
 const prisma = new PrismaClient();
 
 // create a new user
 export const register = async (req: RegisterRequest, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const validationResult = registerSchema.safeParse(req.body);
+    
+    if (!validationResult.success) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: validationResult.error.errors 
+      });
+    }
+
+    const { email, password } = validationResult.data;
 
     const existingUser = await prisma.user.findUnique({
       where: { email }
@@ -55,23 +65,27 @@ export const login = async (req: LoginRequest, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    // login
+    // Find user
     const user = await prisma.user.findUnique({
       where: { email }
     });
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ 
+        error: 'Wrong password'
+      });
     }
 
     // Check password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid credentials :wrong password' });
+      return res.status(401).json({ 
+        error: 'Wrong password'
+      });
     }
 
-    // token
+    // Generate token
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET || 'your-secret-key',
