@@ -4,7 +4,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "start": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "build:prod": "cd ../frontend && npm run build && cd ../backend && npm run build",
+    "start:prod": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +29,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.9"
   }
 }

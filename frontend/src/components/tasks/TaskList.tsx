@@ -16,6 +16,7 @@ const TaskList: FC<TaskListProps> = ({ userId }) => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   const { data: tasks = [], isLoading: isLoadingTasks } = useTasks();
   const createTask = useCreateTask();
@@ -25,6 +26,7 @@ const TaskList: FC<TaskListProps> = ({ userId }) => {
   const handleDelete = async (taskId: string) => {
     try {
       await deleteTask.mutateAsync(taskId);
+      setTaskToDelete(null);
     } catch (err) {
       console.log('Failed to delete task');
     }
@@ -210,7 +212,9 @@ const TaskList: FC<TaskListProps> = ({ userId }) => {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(task.id)}
+                      onClick={() => {
+                        setTaskToDelete(task);
+                      }}
                       className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                     >
                       Delete
@@ -222,6 +226,33 @@ const TaskList: FC<TaskListProps> = ({ userId }) => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {taskToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-xl font-medium mb-4">Confirm Delete</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete the task "{taskToDelete.title}"? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleDelete(taskToDelete.id)}
+                className="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                disabled={deleteTask.isPending}
+              >
+                {deleteTask.isPending ? 'Deleting...' : 'Delete'}
+              </button>
+              <button
+                onClick={() => setTaskToDelete(null)}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Task Modal */}
       {isModalOpen && editingTask && (

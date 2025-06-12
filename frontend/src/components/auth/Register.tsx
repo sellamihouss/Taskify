@@ -1,15 +1,13 @@
 import { useState } from 'react';
 import type { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { User } from '../../types/auth';
+
 import { RegisterForm } from './RegisterForm';
-import { useRegister } from '../../services/queries';
+import {  useRegister } from '../../services/queries';
 
-interface RegisterProps {
-  onLogin: (user: User) => void;
-}
 
-const Register: FC<RegisterProps> = ({ onLogin }) => {
+
+const Register: FC = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string>('');
   const register = useRegister();
@@ -19,8 +17,8 @@ const Register: FC<RegisterProps> = ({ onLogin }) => {
     try {
       const response = await register.mutateAsync(credentials);
       localStorage.setItem('token', response.token);
-      onLogin(response.user);
-      navigate('/tasks', { replace: true });
+      // authService.login(response.user);
+      navigate('/', { replace: true });
     } catch (err) {
       setError('Registration failed');
     }

@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseQueryOptions } from '@tanstack/react-query';
 import { taskService, authService } from './api';
 import type { Task } from '../types/task';
-import type { LoginCredentials, RegisterCredentials } from '../types/auth';
+import type { LoginCredentials, RegisterCredentials, User } from '../types/auth';
 
 // Task Queries
 export const useTasks = () => {
@@ -55,9 +56,10 @@ export const useRegister = () => {
   });
 };
 
-export const useProfile = () => {
+export const useProfile = (options?: Omit<UseQueryOptions<User, Error>, 'queryKey' | 'queryFn'> & { onError?: () => void }) => {
   return useQuery({
     queryKey: ['profile'],
     queryFn: authService.getProfile,
+    ...options,
   });
 }; 
