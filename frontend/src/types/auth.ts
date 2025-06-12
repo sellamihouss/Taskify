@@ -8,11 +8,20 @@ export interface AuthResponse {
   token: string;
 }
 
-export interface LoginCredentials {
+// Types for form data (used with React Hook Form)
+export interface LoginFormData {
   email: string;
   password: string;
 }
 
-export interface  RegisterCredentials extends LoginCredentials {
+export interface RegisterFormData {
+  email: string;
+  password: string;
+}
+
+// Types for API requests
+export interface LoginCredentials extends LoginFormData {}
+
+export interface RegisterCredentials extends RegisterFormData {
   confirmPassword: string;
 } 

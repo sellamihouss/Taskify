@@ -1,53 +1,41 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { FC } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import TaskList from './components/tasks/TaskList';
-import { authService } from './services/api';
+import { useProfile } from './services/queries';
 import type { User } from './types/auth';
 
 const App: FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: profile, isLoading, error } = useProfile();
+  const [manualUser, setManualUser] = useState<User | null>(null);
+  const navigate = useNavigate();
 
-  const checkAuth = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (token) {
-        const profile = await authService.getProfile();
-        setUser(profile);
-      }
-    } catch (error) {
-      localStorage.removeItem('token');
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  // Use profile data if available, otherwise use manual user state
+  const user = profile || manualUser;
 
   const handleLogin = (userData: User) => {
-    setUser(userData);
+    setManualUser(userData);
   };
 
   const handleLogout = () => {
     localStorage.clear();
-    setUser(null);
+    setManualUser(null);
+    navigate('/login');
   };
 
-  if (loading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  return (
-    <Router>
+  if (error) {
+    navigate('/login');
+    return null;
+  }
 
-      {/* {navbar} */}
-      
+  return (
+    <>
       {user && (
         <nav>
           <div>
@@ -92,7 +80,7 @@ const App: FC = () => {
           element={<Navigate to={user ? "/tasks" : "/login"} />}
         />
       </Routes>
-    </Router>
+    </>
   );
 };
 

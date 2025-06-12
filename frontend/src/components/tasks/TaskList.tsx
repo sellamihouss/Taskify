@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { FC } from 'react';
 import type { Task } from '../../types/task';
-import { taskService } from '../../services/api';
+import type { TaskFormData } from '../../validations/schemas';
+import { TaskForm } from './TaskForm';
+import { useTasks, useCreateTask, useUpdateTask, useDeleteTask } from '../../services/queries';
 
 interface TaskListProps {
   userId: string;
 }
 
 const TaskList: FC<TaskListProps> = ({ userId }) => {
-  const [tasks, setTasks] = useState<Task[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('dueDate');
@@ -16,33 +17,28 @@ const TaskList: FC<TaskListProps> = ({ userId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const data = await taskService.getTasks();
-        const userTasks = data.filter(task => task.userId === userId);
-        setTasks(userTasks);
-      } catch (err) {
-        console.log('Failed to fetch tasks');
-      }
-    };
-
-    fetchTasks();
-  }, [userId]);
+  const { data: tasks = [], isLoading: isLoadingTasks } = useTasks();
+  const createTask = useCreateTask();
+  const updateTask = useUpdateTask();
+  const deleteTask = useDeleteTask();
 
   const handleDelete = async (taskId: string) => {
     try {
-      await taskService.deleteTask(taskId);
-      setTasks(tasks.filter(task => task.id !== taskId));
+      await deleteTask.mutateAsync(taskId);
     } catch (err) {
       console.log('Failed to delete task');
     }
   };
 
-  const handleCreate = async (newTask: Omit<Task, 'id' | 'user'>) => {
+  const handleCreate = async (formData: TaskFormData) => {
     try {
-      const result = await taskService.createTask(newTask);
-      setTasks([result,...tasks ]);
+      const newTask: Omit<Task, 'id' | 'user'> = {
+        ...formData,
+        userId,
+        dueDate: new Date(formData.dueDate),
+        description: formData.description || ''
+      };
+      await createTask.mutateAsync(newTask);
       setIsModalOpen(false);
       setIsCreating(false);
       setEditingTask(null);
@@ -51,10 +47,18 @@ const TaskList: FC<TaskListProps> = ({ userId }) => {
     }
   };
 
-  const handleUpdate = async (updatedTask: Task) => {
+  const handleUpdate = async (formData: TaskFormData) => {
+    if (!editingTask) return;
     try {
-      const result = await taskService.updateTask(updatedTask.id, updatedTask);
-      setTasks(tasks.map(task => task.id === result.id ? result : task));
+      const updatedTask: Task = {
+        ...formData,
+        id: editingTask.id,
+        userId,
+        user: editingTask.user,
+        dueDate: new Date(formData.dueDate),
+        description: formData.description || ''
+      };
+      await updateTask.mutateAsync({ id: updatedTask.id, task: updatedTask });
       setIsModalOpen(false);
       setEditingTask(null);
     } catch (err) {
@@ -85,6 +89,7 @@ const TaskList: FC<TaskListProps> = ({ userId }) => {
 
   // Filter and sort tasks
   const filteredAndSortedTasks = tasks
+    .filter(task => task.userId === userId)
     .filter(task => statusFilter === 'all' || task.status === statusFilter)
     .filter(task => priorityFilter === 'all' || task.priority === priorityFilter)
     .sort((a, b) => {
@@ -101,6 +106,14 @@ const TaskList: FC<TaskListProps> = ({ userId }) => {
       }
       return 0;
     });
+
+  if (isLoadingTasks) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 w-full flex items-center justify-center">
+        <div className="text-gray-500">Loading tasks...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 w-full">
@@ -215,92 +228,32 @@ const TaskList: FC<TaskListProps> = ({ userId }) => {
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-xl font-medium mb-4">{isCreating ? 'Create New Task' : 'Edit Task'}</h3>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              if (isCreating) {
-                handleCreate(editingTask);
-              } else {
-                handleUpdate(editingTask);
-              }
-            }}>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Title</label>
-                  <input
-                    type="text"
-                    value={editingTask.title}
-                    onChange={(e) => setEditingTask({...editingTask, title: e.target.value})}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Description</label>
-                  <textarea
-                    value={editingTask.description}
-                    onChange={(e) => setEditingTask({...editingTask, description: e.target.value})}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    rows={3}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Priority</label>
-                  <select
-                    value={editingTask.priority}
-                    onChange={(e) => setEditingTask({...editingTask, priority: e.target.value as 'low' | 'medium' | 'high'})}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Status</label>
-                  <select
-                    value={editingTask.status}
-                    onChange={(e) => setEditingTask({...editingTask, status: e.target.value as 'pending' | 'in-progress' | 'completed'})}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Due Date</label>
-                  <input
-                    type="date"
-                    value={new Date(editingTask.dueDate).toISOString().split('T')[0]}
-                    onChange={(e) => setEditingTask({...editingTask, dueDate: new Date(e.target.value)})}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="mt-6 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    setEditingTask(null);
-                    setIsCreating(false);
-                  }}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                >
-                  {isCreating ? 'Create Task' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
+            <TaskForm
+              onSubmit={(data) => {
+                if (isCreating) {
+                  handleCreate(data);
+                } else {
+                  handleUpdate(data);
+                }
+              }}
+              isLoading={createTask.isPending || updateTask.isPending}
+              initialData={{
+                title: editingTask.title,
+                description: editingTask.description,
+                status: editingTask.status,
+                priority: editingTask.priority,
+                dueDate: new Date(editingTask.dueDate).toISOString().split('T')[0]
+              }}
+            />
+            <button
+              onClick={() => {
+                setIsModalOpen(false);
+                setEditingTask(null);
+              }}
+              className="mt-4 w-full px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
