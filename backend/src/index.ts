@@ -17,7 +17,8 @@ app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the React build directory
-app.use(express.static(path.join(__dirname, '../../frontend/dist')));
+// app.use(express.static(path.join(__dirname, '../../frontend/dist')));
+app.use(express.static(path.resolve(__dirname, '../../frontend/dist')));
 
 app.get("/check", (req: Request, res: Response) => {
   res.json({ message: "API running" });
@@ -27,8 +28,16 @@ app.use('/api/users', userRoutes);
 app.use('/api/tasks', auth, taskRoutes); // Protected task routes
 
 // Handle React routing, return all requests to React app
+// app.get('', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
+// });
+
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
+  if (!req.originalUrl.startsWith('/api')) {
+    res.sendFile(path.resolve(__dirname, '../../frontend/dist/index.html'));
+  } else {
+    res.status(404).json({ error: 'API route not found' });
+  }
 });
 
 const PORT = process.env.PORT || 3000;
