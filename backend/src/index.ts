@@ -16,28 +16,8 @@ app.use(cors());
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
-// Configure proper MIME types
-app.use((req, res, next) => {
-  if (req.url.endsWith('.js')) {
-    res.type('application/javascript');
-  } else if (req.url.endsWith('.mjs')) {
-    res.type('application/javascript');
-  } else if (req.url.endsWith('.css')) {
-    res.type('text/css');
-  }
-  next();
-});
-
 // Serve static files from the React build directory
-app.use(express.static(path.join(__dirname, '../../frontend/dist'), {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
-    } else if (path.endsWith('.mjs')) {
-      res.setHeader('Content-Type', 'application/javascript');
-    }
-  }
-}));
+app.use(express.static(path.join(__dirname, '../../frontend/dist')));
 
 app.get("/check", (req: Request, res: Response) => {
   res.json({ message: "API running" });
