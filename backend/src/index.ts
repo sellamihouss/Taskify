@@ -27,7 +27,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/tasks', auth, taskRoutes); // Protected task routes
 
 // Handle React routing, return all requests to React app
-app.get('', (req, res) => {
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
 });
 
