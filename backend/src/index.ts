@@ -30,12 +30,9 @@ app.use('/api/users', userRoutes);
 app.use('/api/tasks', auth, taskRoutes); // Protected task routes
 
 // Catch-all route to serve index.html for React client-side routing
-app.get('*', (req, res) => {
-  if (!req.originalUrl.startsWith('/api')) {
+app.get('/*', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
-  } else {
-    res.status(404).json({ error: 'API route not found' });
-  }
+
 });
 
 const PORT = process.env.PORT || 3000;
