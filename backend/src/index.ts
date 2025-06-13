@@ -30,7 +30,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/tasks', auth, taskRoutes); // Protected task routes
 
 // Catch-all route to serve index.html for React client-side routing
-app.get('/*', (req, res) => {
+app.get('', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
 
 });
