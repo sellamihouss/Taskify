@@ -24,11 +24,11 @@ const Login: FC = () => {
 
   return (
         <div className="max-w-md mx-auto mt-20 p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">Welcome back, legend... of procrastination</h1>
+      <h1 className="text-2xl font-bold text-gray-900 text-center">Welcome back, legend... of procrastination</h1>
       {error && (
         <div className="text-red-500 text-center mb-4">{error}</div>
       )}
-    <div className="flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center py-5 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
         
@@ -36,6 +36,7 @@ const Login: FC = () => {
         <LoginForm onSubmit={handleSubmit}  isLoading={login.isPending} />
       </div>
     </div>
+    <div className="text-center">
          <button
           type="button"
           onClick={() => navigate('/register')}
@@ -43,6 +44,8 @@ const Login: FC = () => {
         >
           don't have an account? register
         </button>
+      </div>
+
     </div>
   );
 };

@@ -27,7 +27,7 @@ const Register: FC = () => {
   return (
     <div className="max-w-md mx-auto mt-20 p-6">
       <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">Go ahead, register... what could possibly go wrong?</h1>
-      <br />
+    
 
       {error && (
         <div className="text-red-500 text-center mb-4">{error}</div>
