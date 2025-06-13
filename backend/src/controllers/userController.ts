@@ -1,10 +1,10 @@
 import { Response } from 'express';
-import { PrismaClient } from '../generated/prisma';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { RegisterRequest, LoginRequest } from '../interfaces/user.interface';
 import { AuthRequest } from '../interfaces/auth.interface';
 import { registerSchema, loginSchema } from '../validations/user.validation';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -14,10 +14,11 @@ export const register = async (req: RegisterRequest, res: Response) => {
     const validationResult = registerSchema.safeParse(req.body);
     
     if (!validationResult.success) {
-      return res.status(400).json({ 
+       res.status(400).json({ 
         error: 'Validation failed', 
         details: validationResult.error.errors 
       });
+      return
     }
 
     const { email, password } = validationResult.data;
@@ -27,7 +28,8 @@ export const register = async (req: RegisterRequest, res: Response) => {
     });
 
     if (existingUser) {
-      return res.status(400).json({ error: 'Email already registered' });
+       res.status(400).json({ error: 'Email already registered' });
+       return
     }
 
     // Hashing password
@@ -71,18 +73,20 @@ export const login = async (req: LoginRequest, res: Response) => {
     });
 
     if (!user) {
-      return res.status(401).json({ 
+       res.status(401).json({ 
         error: 'Wrong password'
       });
+      return
     }
 
     // Check password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ 
+       res.status(401).json({ 
         error: 'Wrong password'
       });
+      return
     }
 
     // Generate token
@@ -110,7 +114,8 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
+       res.status(401).json({ error: 'User not authenticated' });
+       return
     }
 
     const user = await prisma.user.findUnique({
@@ -123,7 +128,8 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
     });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+       res.status(404).json({ error: 'User not found' });
+       return
     }
 
     res.json(user);

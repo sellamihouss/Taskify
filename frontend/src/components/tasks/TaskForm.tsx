@@ -63,7 +63,7 @@ export const TaskForm = ({ onSubmit, isLoading = false, initialData }: TaskFormP
           disabled={isLoading}
         >
           <option value="pending">Pending</option>
-          <option value="in-progress">In Progress</option>
+          <option value="inProgress">In Progress</option>
           <option value="completed">Completed</option>
         </select>
         {errors.status && (

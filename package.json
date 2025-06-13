@@ -1,0 +1,37 @@
+{
+  "name": "taskify",
+  "version": "1.0.0",
+  "description": "A modern task management application built with a React frontend and Node.js backend.",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "npm run build --workspace=frontend",
+    "build:backend": "npm run build --workspace=backend",
+    "start": "npm run start --workspace=backend",
+    "prisma:generate": "npm run prisma:generate --workspace=backend",
+    "prisma:migrate": "npm run prisma:migrate --workspace=backend",
+    "prisma:deploy": "npm run prisma:deploy --workspace=backend",
+    "postinstall": "npm run prisma:generate && npm run prisma:deploy"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sellamihouss/Taskify.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sellamihouss/Taskify/issues"
+  },
+  "homepage": "https://github.com/sellamihouss/Taskify#readme"
+}

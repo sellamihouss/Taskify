@@ -4,7 +4,7 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  status: 'pending' | 'in-progress' | 'completed';
+  status: 'pending' | 'inProgress' | 'completed';
   dueDate: Date;
   priority: 'low' | 'medium' | 'high';
   userId: string;

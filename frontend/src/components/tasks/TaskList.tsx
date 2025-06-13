@@ -103,7 +103,7 @@ const TaskList: FC<TaskListProps> = ({ userId }) => {
         return priorityOrder[a.priority as keyof typeof priorityOrder] - priorityOrder[b.priority as keyof typeof priorityOrder];
       }
       if (sortBy === 'status') {
-        const statusOrder = { pending: 0, 'in-progress': 1, completed: 2 };
+        const statusOrder = { pending: 0, 'inProgress': 1, completed: 2 };
         return statusOrder[a.status as keyof typeof statusOrder] - statusOrder[b.status as keyof typeof statusOrder];
       }
       return 0;
@@ -141,7 +141,7 @@ const TaskList: FC<TaskListProps> = ({ userId }) => {
           >
             <option value="all">All Statuses</option>
             <option value="pending">Pending</option>
-            <option value="in-progress">In Progress</option>
+            <option value="inProgress">In Progress</option>
             <option value="completed">Completed</option>
           </select>
 
@@ -193,7 +193,7 @@ const TaskList: FC<TaskListProps> = ({ userId }) => {
                       <span className="font-medium mr-2">Status:</span>
                       <span className={`px-2 py-1 rounded text-sm ${
                         task.status === 'completed' ? 'bg-green-100 text-green-800' :
-                        task.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                        task.status === 'inProgress' ? 'bg-blue-100 text-blue-800' :
                         'bg-gray-100 text-gray-800'
                       }`}>
                         {task.status}

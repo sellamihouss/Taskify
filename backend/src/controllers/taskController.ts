@@ -1,24 +1,26 @@
 import { Response, Request } from 'express';
-import { PrismaClient } from '../generated/prisma';
 import { CreateTaskRequest, UpdateTaskRequest, TaskIdRequest } from '../interfaces/task.interface';
 import { createTaskSchema, updateTaskSchema } from '../validations/task.validation';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 // Create a new task
 export const createTask = async (req: CreateTaskRequest, res: Response) => {
-  try {
-    // zod to validate task creation
-    const validationResult = createTaskSchema.safeParse(req.body);
-    
-    if (!validationResult.success) {
-      return res.status(400).json({ 
-        error: 'Validation failed', 
-        details: validationResult.error.errors 
-      });
-    }
+  // zod to validate task creation
+  const validationResult = createTaskSchema.safeParse(req.body);
 
-    const { title, description, status, dueDate, priority, userId } = validationResult.data;
+  if (!validationResult.success) {
+    res.status(400).json({
+      error: 'Validation failed',
+      details: validationResult.error.errors
+    });
+    return
+  }
+
+  const { title, description, status, dueDate, priority, userId } = validationResult.data;
+
+  try {
     const task = await prisma.task.create({
       data: {
         title,
@@ -65,11 +67,12 @@ export const getTaskById = async (req: TaskIdRequest, res: Response) => {
       }
     });
     if (!task) {
-      return res.status(404).json({ error: 'Task not found' });
+      res.status(404).json({ error: 'Task not found' });
+      return
     }
-    return res.json(task);
+    res.json(task);
   } catch (error) {
-   return res.status(500).json({ error: 'Failed to fetch task' });
+    res.status(500).json({ error: 'Failed to fetch task' });
   }
 };
 
@@ -77,14 +80,15 @@ export const getTaskById = async (req: TaskIdRequest, res: Response) => {
 export const updateTask = async (req: UpdateTaskRequest, res: Response) => {
   try {
     const { id } = req.params;
-    
+
     const validationResult = updateTaskSchema.safeParse(req.body);
-    
+
     if (!validationResult.success) {
-      return res.status(400).json({ 
-        error: 'Validation failed', 
-        details: validationResult.error.errors 
+     res.status(400).json({
+        error: 'Validation failed',
+        details: validationResult.error.errors
       });
+      return
     }
 
     const { title, description, status, dueDate, priority } = validationResult.data;

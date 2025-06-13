@@ -17,8 +17,8 @@ export const registerSchema = z.object({
 export const taskSchema = z.object({
   title: z.string().min(1, 'Title is required').max(100, 'Title must be less than 100 characters'),
   description: z.string().max(500, 'Description must be less than 500 characters').optional(),
-  status: z.enum(['pending', 'in-progress', 'completed'], {
-    errorMap: () => ({ message: 'Status must be pending, in-progress, or completed' })
+  status: z.enum(['pending', 'inProgress', 'completed'], {
+    errorMap: () => ({ message: 'Status must be pending, inProgress, or completed' })
   }),
   dueDate: z.string().min(1, 'Due date is required'),
   priority: z.enum(['low', 'medium', 'high'], {
