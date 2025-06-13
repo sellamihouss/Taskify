@@ -5,7 +5,7 @@ import { AuthRequest } from '../interfaces/auth.interface';
 export const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
-
+    console.log({token})
     if (!token) {
       throw new Error();
     }
@@ -16,6 +16,7 @@ export const auth = async (req: AuthRequest, res: Response, next: NextFunction) 
     };
 
     req.user = decoded;
+    console.log("done in auth")
     next();
   } catch (error) {
     res.status(401).json({ error: 'Please authenticate' });

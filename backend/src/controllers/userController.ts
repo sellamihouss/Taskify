@@ -106,6 +106,7 @@ export const login = async (req: LoginRequest, res: Response) => {
 
 // Get current user 
 export const getProfile = async (req: AuthRequest, res: Response) => {
+  console.log("getting profile")
   try {
     const userId = req.user?.id;
     if (!userId) {
