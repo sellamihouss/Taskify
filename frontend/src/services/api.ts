@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AuthResponse, LoginCredentials, RegisterCredentials } from '../types/auth';
 import type { Task } from '../types/task';
 
-const API_URL = 'https://taskify-cn05.onrender.com'
+const API_URL = 'http://localhost:3000/api';
 
 const api = axios.create({
   baseURL: API_URL,

@@ -30,9 +30,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/tasks', auth, taskRoutes); // Protected task routes
 
 // Catch-all route to serve index.html for React client-side routing
-app.get('', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-
+app.get('/*splat', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
