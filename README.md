@@ -2,141 +2,140 @@
 
 A modern task management application built with a React frontend and Node.js backend.
 
-## Setup Instructions
-
-
-### Database Setup
-1. Install PostgreSQL on your system if not already installed
-2. Create a new PostgreSQL database:
-   ```bash
-   createdb taskify
-   ```
-3. Install Prisma CLI globally:
-   ```bash
-   npm install -g prisma
-   ```
-
-### Backend Setup
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file in the backend directory with the following variables:
-   ```
-   PORT=3000
-   DATABASE_URL="postgresql://username:password@localhost:5432/taskify'
-   JWT_SECRET='your-secret-key'
-   ```
-4. Initialize Prisma and create database tables:
-   ```bash
-   npx prisma generate
-   npx prisma migrate dev --name init
-   ```
-5. Start the backend server:
-   ```bash
-   npm start
-   ```
-
-### Frontend Setup
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file in the frontend directory with:
-   ```
-   REACT_APP_API_URL=http://localhost:3000/api
-   ```
-4. Start the frontend development server:
-   ```bash
-   npm run dev
-   ```
-
-## Key Design Decisions
-
-### Architecture
-- **Frontend-Backend Separation**: The application follows a clear separation between frontend and backend services, allowing for independent scaling and maintenance.
-- **RESTful API**: The backend implements RESTful principles for clear and consistent API endpoints.
-- **JWT Authentication**: Secure user authentication using JSON Web Tokens for stateless authentication.
+## Tech Stack
 
 ### Frontend
-- **React**: Chosen for its component-based architecture and efficient rendering.
-- **Tailwind CSS**: Used for styling 
-  - Responsive design
-
-- **React Query**: Implemented for efficient server state management.
-  - Automatic background refetching
-  - Cache management
-  - Error handling and retry logic
-  - State management
-
-- **Responsive Design**: Mobile-first approach ensuring the application works well on all devices.
+- **React 18** - UI library
+- **TypeScript** - Type safety and better developer experience
+- **Tailwind CSS** - Utility-first CSS framework
+- **React Query** - Server state management
+- **React Router** - Client-side routing
+- **Axios** - HTTP client
+- **Zod** - Schema validation
+- **Vite** - Build tool and development server
 
 ### Backend
-- **Node.js & Express**: Selected for their non-blocking I/O and efficient handling of concurrent requests.
-- **PostgreSQL**: Chosen as the primary database for its reliability and robust feature set.
-- **Prisma ORM**: Used for type-safe database access and migrations.
-- **Middleware Architecture**: Implemented for request processing, authentication
+- **Node.js** - Runtime environment
+- **Express.js** - Web framework
+- **TypeScript** - Type safety
+- **Prisma** - ORM and database toolkit
+- **PostgreSQL** - Primary database
+- **JWT** - Authentication
+- **Bcrypt** - Password hashing
+- **Cors** - Cross-origin resource sharing
+- **Dotenv** - Environment variable management
 
-### Security
-- **Environment Variables**: Sensitive configuration stored in environment variables.
-- **Password Hashing**: Secure password storage using bcrypt.
-- **Input Validation**: Comprehensive validation on both frontend and backend.
-- **CORS**: Properly configured for secure cross-origin requests.
-
-### Performance
-
-- **Caching**: Strategic caching of frequently accessed data.
-- **Optimized Queries**: Database queries optimized for performance using Prisma's query engine.
-
-### Database Management
-- **Prisma Migrations**: Used for version-controlled database schema changes.
-- **Type Safety**: Prisma provides type-safe database queries and schema definitions.
-
-
-### State Management
-- **React Query**: Used for server state management with features like:
-  - Automatic background refetching
-  - Cache invalidation
-  - Optimistic updates
-
-## Project Architecture
+## Project Structure
 
 ```
 Taskify/
 ├── frontend/                 # React frontend application
 │   ├── src/
-│   │   ├── components/      # Reusable React components
-│   │   ├── pages/          # Page components
+│   │   ├── components/     # Reusable React components
 │   │   ├── services/       # API service functions
 │   │   ├── validations/    # Form validation schemas
-│   │   └── types/          # TypeScript type definitions
-│   ├── public/             # Static assets
+│   │   ├── types/          # TypeScript type definitions
+│   │   ├── contexts/       # React context providers
+│   │   └── assets/         # Static assets
+│   ├── public/             # Public static files
 │   └── dist/               # Production build output
 │
-├── backend/                 # Node.js backend application
+├── backend/                # Node.js backend application
 │   ├── src/
 │   │   ├── routes/         # API route handlers
 │   │   ├── controllers/    # Business logic
 │   │   ├── middlewares/    # Express middlewares
-│   │   ├── services/       # Service layer
-│   │   └── generated/      # Generated Prisma client
+│   │   ├── validations/    # data type validation
+│   │   └── interfaces/          # TypeScript interfaces
 │   └── prisma/             # Database schema and migrations
 │
 └── README.md               # Project documentation
 ```
 
+## Development Setup
+
+### Prerequisites
+- Node.js (v18 or higher)
+- PostgreSQL (v14 or higher)
+- npm package manager
+
+### Environment Variables
+
+#### Backend (.env)
+```env
+# Server Configuration
+PORT=3000
+DATABASE_URL="postgresql://username:password@localhost:5432/taskify"
+
+# Authentication
+JWT_SECRET='your-secret-key'
+
+```
+
+#### Frontend (.env)
+```env
+# API Configuration
+VITE_API_URL=http://localhost:3000/api
+
+```
+
+### Setup Process
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/sellamihouss/Taskify
+   cd taskify
+   ```
+
+2. **Database Setup**
+   ```bash
+   # Install PostgreSQL if not already installed
+   # Create database
+   createdb taskify
+   ```
+
+3. **Backend Setup**
+   ```bash
+   # Set up environment variables
+   cp .env.example .env
+
+   # Edit .env with your configuration
+   
+   # Install dependencies
+   npm install
+
+   
+   # Start development server
+   npm run dev
+   ```
+
+4. **Frontend Setup**
+   ```bash
+   cd frontend
+   
+   # Install dependencies
+   npm install
+   
+   # Set up environment variables
+   cp .env.example .env
+
+   # Edit .env with your configuration
+   
+   # Start development server
+   npm run dev
+   ```
+
+### Development Workflow
 
 
 
-### API Documentation
+**Database Migrations**
+   ```bash
+   npm run prisma:migrate
+   ```
+
+
+## API Documentation
 
 #### Authentication Endpoints
 
@@ -161,9 +160,6 @@ Taskify/
   }
   ```
 - **Response**: JWT token and user data
-
-
-
 
 #### Task Endpoints
 
@@ -198,4 +194,17 @@ Taskify/
 - **Description**: Delete a task
 - **Headers**: `Authorization: Bearer <token>`
 - **Response**: Success message
+
+
+
+##### Which stretch goals were achieved
+- **monoRepo**
+- **deployment**
+
+
+
+##### What was the hardest part ?
+- **learning TS**
+- **managing to implement some required technologies that i dont have prior experience with in a short time**
+- **deploying the project**
 
